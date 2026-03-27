@@ -70,8 +70,8 @@ export default function HomePage() {
             </div>
             <div>
               <h1
-                className="text-xl font-bold font-mono leading-none"
-                style={{ color: "#c8a848", textShadow: "0 0 12px rgba(200,168,72,0.6)" }}
+                className="text-xl font-bold leading-none"
+                style={{ color: "#c8a848", textShadow: "0 0 12px rgba(200,168,72,0.6)", fontFamily: "var(--font-display)", letterSpacing: "0.05em" }}
               >
                 WoW Tracker
               </h1>
@@ -140,26 +140,26 @@ export default function HomePage() {
 
             {/* Legend */}
             <div className="rounded-xl border border-[#334155] bg-[#0f172a] p-4">
-              <h3 className="text-xs font-bold font-mono text-[#94a3b8] uppercase tracking-widest mb-1">
+              <h3 className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1" style={{ fontFamily: "var(--font-display)" }}>
                 Scoring
               </h3>
-              <p className="text-[9px] font-mono text-[#475569] mb-2 leading-relaxed">
-                z-score vs EU population<br />
-                ilvl μ645 σ13 · M+ μ1000 σ750
+              <p className="text-[9px] text-[#475569] mb-2 leading-relaxed">
+                Ranked relative to your group.<br />
+                ilvl × 0.4 + M+ × 0.6
               </p>
-              <div className="space-y-1.5 text-xs font-mono">
+              <div className="space-y-1.5 text-xs">
                 {[
-                  { tier: "S", label: "top ~2.5%",   sub: "z ≥ +2.0", color: "#ffd700" },
-                  { tier: "A", label: "top ~16%",    sub: "z ≥ +1.0", color: "#a335ee" },
-                  { tier: "B", label: "above avg",   sub: "z ≥  0.0", color: "#0070dd" },
-                  { tier: "C", label: "below avg",   sub: "z ≥ −1.0", color: "#1eff00" },
-                  { tier: "D", label: "bottom ~16%", sub: "z ≥ −2.0", color: "#9d9d9d" },
-                  { tier: "F", label: "bottom ~2.5%",sub: "z < −2.0", color: "#c41e3a" },
+                  { tier: "S", label: "Top of group",    sub: "z ≥ +1.5", color: "#ffd700" },
+                  { tier: "A", label: "Above average",   sub: "z ≥ +0.5", color: "#a335ee" },
+                  { tier: "B", label: "Around average",  sub: "z ≥ −0.5", color: "#0070dd" },
+                  { tier: "C", label: "Below average",   sub: "z ≥ −1.5", color: "#1eff00" },
+                  { tier: "D", label: "Well below",      sub: "z ≥ −2.5", color: "#9d9d9d" },
+                  { tier: "F", label: "Bottom of group", sub: "z < −2.5", color: "#c41e3a" },
                 ].map((row) => (
                   <div key={row.tier} className="flex items-center gap-2">
-                    <span className="w-5 font-bold" style={{ color: row.color }}>{row.tier}</span>
-                    <span className="text-[#94a3b8]">{row.label}</span>
-                    <span className="text-[#334155] ml-auto">{row.sub}</span>
+                    <span className="w-5 font-bold" style={{ color: row.color, fontFamily: "var(--font-display)" }}>{row.tier}</span>
+                    <span className="text-[#94a3b8] text-[11px]">{row.label}</span>
+                    <span className="text-[#334155] text-[10px] ml-auto">{row.sub}</span>
                   </div>
                 ))}
               </div>

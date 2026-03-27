@@ -1,44 +1,64 @@
 import type { CharacterProfile, TierEntry, TierLabel, TierList } from "@/types";
 
 /**
- * Scoring model: z-score normalization against EU active M+ population.
+ * Scoring model — two separate concerns:
  *
- * Reference points (TWW Season 2, Icy Veins / Raider.io data):
- *   avg +2  player  → ilvl 636  /  IO  305   (below-average active player)
- *   avg +7  player  → ilvl 652  /  IO 1942   (~75th percentile)
- *   avg +10 player  → ilvl 662  /  IO 2420   (~85–90th percentile)
+ * 1. TIER ASSIGNMENT: group-relative z-scores.
+ *    Characters are ranked against each other, not an external baseline.
+ *    This means a 5 ilvl or 341 M+ point gap is always meaningful regardless
+ *    of what expansion/season the characters are from.
  *
- * From those three anchors we estimate the EU active player distribution:
- *   ilvl  : mean 645, σ 13   (5 ilvl ≈ 0.38σ — genuinely meaningful)
- *   M+    : mean 1000, σ 750  (341 pts ≈ 0.45σ — genuinely meaningful)
+ * 2. EU PERCENTILE (display only): where the character's M+ score sits vs
+ *    the EU active-player population. Uses M+ score only since ilvl ranges
+ *    shift drastically between seasons; M+ score is the stable cross-season
+ *    signal on Raider.io.
  *
- * Composite z = ilvlZ × 0.4 + mplusZ × 0.6
- *
- * Tier thresholds (z-score):
- *   S  ≥  2.0   top ~2.5 %  — elite
- *   A  ≥  1.0   top ~16 %   — very strong
- *   B  ≥  0.0   top ~50 %   — above average
- *   C  ≥ -1.0   bottom 50–84 % — below average
- *   D  ≥ -2.0   bottom 2.5–16 % — well below
- *   F  < -2.0   bottom ~2.5 % — far below
+ *    Reference (TWW Season 2, Icy Veins data):
+ *      avg +2  player  → IO  305  (~bottom third)
+ *      avg +7  player  → IO 1942  (~75th percentile)
+ *      avg +10 player  → IO 2420  (~85–90th percentile)
+ *    Estimated: mean 1000, σ 750
  */
 
-const EU = {
-  ilvl:  { mean: 645, stdDev: 13 },
-  mplus: { mean: 1000, stdDev: 750 },
-};
-
+// ── Weights ──────────────────────────────────────────────────────────────────
 const ILVL_WEIGHT  = 0.4;
 const MPLUS_WEIGHT = 0.6;
 
-function zScore(value: number, mean: number, stdDev: number): number {
-  return (value - mean) / stdDev;
+// ── EU M+ population estimate (for percentile badge only) ─────────────────
+const EU_MPLUS = { mean: 1000, stdDev: 750 };
+
+// ── Tier thresholds (composite z-score, group-relative) ──────────────────
+//   S  ≥ +1.5   top performers in the group
+//   A  ≥ +0.5
+//   B  ≥ -0.5   around group average
+//   C  ≥ -1.5
+//   D  ≥ -2.5
+//   F  < -2.5   far below group average
+const THRESHOLDS: [number, TierLabel][] = [
+  [1.5,  "S"],
+  [0.5,  "A"],
+  [-0.5, "B"],
+  [-1.5, "C"],
+  [-2.5, "D"],
+];
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function mean(values: number[]): number {
+  return values.reduce((a, b) => a + b, 0) / values.length;
 }
 
-/**
- * Approximation of the normal CDF used to convert z → percentile.
- * Accurate to ~0.5% across the full range.
- */
+function stdDev(values: number[], mu: number): number {
+  const variance = values.reduce((acc, v) => acc + (v - mu) ** 2, 0) / values.length;
+  return Math.sqrt(variance);
+}
+
+function zScore(value: number, mu: number, sigma: number): number {
+  // If everyone has the same value sigma=0 — treat as z=0 (all equal)
+  if (sigma === 0) return 0;
+  return (value - mu) / sigma;
+}
+
+/** Approximate normal CDF → percentile (0–100). */
 function zToPercentile(z: number): number {
   const t = 1 / (1 + 0.2316419 * Math.abs(z));
   const poly =
@@ -51,45 +71,49 @@ function zToPercentile(z: number): number {
   return Math.round((z >= 0 ? p : 1 - p) * 100);
 }
 
-export function computeCompositeScore(ilvl: number, mplusScore: number): {
-  composite: number;   // weighted composite z-score (rounded to 2 dp)
-  ilvlZ: number;
-  mplusZ: number;
-  percentile: number;  // estimated EU population percentile
-} {
-  const ilvlZ  = zScore(ilvl,       EU.ilvl.mean,  EU.ilvl.stdDev);
-  const mplusZ = zScore(mplusScore, EU.mplus.mean, EU.mplus.stdDev);
-  const composite = Math.round((ilvlZ * ILVL_WEIGHT + mplusZ * MPLUS_WEIGHT) * 100) / 100;
-  const percentile = zToPercentile(composite);
-  return { composite, ilvlZ, mplusZ, percentile };
-}
-
-export function assignTier(compositeZ: number): TierLabel {
-  if (compositeZ >=  2.0) return "S";
-  if (compositeZ >=  1.0) return "A";
-  if (compositeZ >=  0.0) return "B";
-  if (compositeZ >= -1.0) return "C";
-  if (compositeZ >= -2.0) return "D";
+function assignTier(compositeZ: number): TierLabel {
+  for (const [threshold, tier] of THRESHOLDS) {
+    if (compositeZ >= threshold) return tier;
+  }
   return "F";
 }
 
+// ── Public API ────────────────────────────────────────────────────────────
 export function buildTierList(characters: CharacterProfile[]): TierList {
+  const empty: TierList = { S: [], A: [], B: [], C: [], D: [], F: [] };
+  if (characters.length === 0) return empty;
+
+  // Compute group statistics
+  const ilvls      = characters.map((c) => c.ilvl);
+  const mplusScores = characters.map((c) => c.mplusScore);
+
+  const ilvlMean  = mean(ilvls);
+  const ilvlSigma = stdDev(ilvls, ilvlMean);
+
+  const mplusMean  = mean(mplusScores);
+  const mplusSigma = stdDev(mplusScores, mplusMean);
+
   const entries: TierEntry[] = characters
     .map((character) => {
-      const { composite, percentile } = computeCompositeScore(
-        character.ilvl,
-        character.mplusScore
-      );
+      // Group-relative z-scores
+      const ilvlZ  = zScore(character.ilvl,        ilvlMean,  ilvlSigma);
+      const mplusZ = zScore(character.mplusScore,   mplusMean, mplusSigma);
+      const compositeZ = ilvlZ * ILVL_WEIGHT + mplusZ * MPLUS_WEIGHT;
+
+      // EU percentile based on M+ score only (cross-season stable)
+      const euMplusZ   = zScore(character.mplusScore, EU_MPLUS.mean, EU_MPLUS.stdDev);
+      const percentile = zToPercentile(euMplusZ);
+
       return {
         character,
-        compositeScore: composite,
+        compositeScore: Math.round(compositeZ * 100) / 100,
         percentile,
-        tier: assignTier(composite),
+        tier: assignTier(compositeZ),
       };
     })
     .sort((a, b) => b.compositeScore - a.compositeScore);
 
-  const tierList: TierList = { S: [], A: [], B: [], C: [], D: [], F: [] };
+  const tierList: TierList = { ...empty };
   for (const entry of entries) {
     tierList[entry.tier].push(entry);
   }

@@ -49,10 +49,11 @@ export default function TierList({ tierList, onRemove }: Props) {
               className="flex items-center gap-3 px-4 py-2 border-b border-[#1e293b]"
             >
               <span
-                className="text-2xl font-bold font-mono w-8 text-center leading-none"
+                className="text-2xl font-bold w-8 text-center leading-none"
                 style={{
                   color: config.color,
                   textShadow: `0 0 10px ${config.color}88`,
+                  fontFamily: "var(--font-display)",
                 }}
               >
                 {config.label}

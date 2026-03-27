@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -15,6 +15,8 @@
   --uncommon: #1eff00;
   --common: #9d9d9d;
   --legendary: #ff8000;
+  --font-display: 'Cinzel', 'Georgia', serif;
+  --font-body: 'Inter', system-ui, sans-serif;
 }
 
 * {
@@ -24,11 +26,13 @@
 html, body {
   background-color: var(--bg-base);
   color: var(--text-primary);
-  font-family: 'Fira Sans', sans-serif;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
   min-height: 100vh;
 }
 
-/* WoW-style scanline overlay */
+/* WoW-style subtle scanline overlay */
 body::before {
   content: '';
   position: fixed;
@@ -36,25 +40,23 @@ body::before {
   background: repeating-linear-gradient(
     0deg,
     transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
+    transparent 3px,
+    rgba(0, 0, 0, 0.02) 3px,
+    rgba(0, 0, 0, 0.02) 4px
   );
   pointer-events: none;
   z-index: 9999;
 }
 
-/* Gold glow utility */
+/* Display font helper */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+}
+
+/* Gold glow */
 .glow-gold {
-  text-shadow: 0 0 8px rgba(200, 168, 72, 0.8), 0 0 20px rgba(200, 168, 72, 0.4);
-}
-
-.glow-epic {
-  text-shadow: 0 0 8px rgba(163, 53, 238, 0.8), 0 0 20px rgba(163, 53, 238, 0.4);
-}
-
-.glow-blue {
-  text-shadow: 0 0 8px rgba(0, 112, 221, 0.8), 0 0 20px rgba(0, 112, 221, 0.4);
+  text-shadow: 0 0 10px rgba(200, 168, 72, 0.7), 0 0 24px rgba(200, 168, 72, 0.3);
 }
 
 /* WoW item quality border colors */
