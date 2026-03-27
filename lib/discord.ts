@@ -6,6 +6,7 @@ const TIER_COLORS: Record<string, number> = {
   B: 0x0070dd, // Rare blue
   C: 0x1eff00, // Uncommon green
   D: 0x9d9d9d, // Common grey
+  F: 0xc41e3a, // Death Knight red
 };
 
 const TIER_EMOJI: Record<string, string> = {
@@ -14,6 +15,7 @@ const TIER_EMOJI: Record<string, string> = {
   B: "🛡️",
   C: "🗡️",
   D: "💀",
+  F: "🪦",
 };
 
 function formatTierField(
@@ -39,8 +41,8 @@ export async function postTierListToDiscord(tierList: TierList): Promise<void> {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) throw new Error("DISCORD_WEBHOOK_URL is not set");
 
-  const fields = (["S", "A", "B", "C", "D"] as const)
-    .map((tier) => formatTierField(tier, tierList[tier]))
+  const fields = (["S", "A", "B", "C", "D", "F"] as const)
+    .map((tier) => formatTierField(tier, tierList[tier as keyof TierList]))
     .filter(Boolean);
 
   const totalChars = Object.values(tierList).flat().length;

@@ -26,10 +26,11 @@ export function computeCompositeScore(
 
 export function assignTier(compositeScore: number): TierLabel {
   if (compositeScore >= 80) return "S";
-  if (compositeScore >= 60) return "A";
-  if (compositeScore >= 40) return "B";
-  if (compositeScore >= 20) return "C";
-  return "D";
+  if (compositeScore >= 65) return "A";
+  if (compositeScore >= 45) return "B";
+  if (compositeScore >= 30) return "C";
+  if (compositeScore >= 15) return "D";
+  return "F";
 }
 
 export function buildTierList(characters: CharacterProfile[]): TierList {
@@ -47,7 +48,7 @@ export function buildTierList(characters: CharacterProfile[]): TierList {
     })
     .sort((a, b) => b.compositeScore - a.compositeScore);
 
-  const tierList: TierList = { S: [], A: [], B: [], C: [], D: [] };
+  const tierList: TierList = { S: [], A: [], B: [], C: [], D: [], F: [] };
   for (const entry of entries) {
     tierList[entry.tier].push(entry);
   }

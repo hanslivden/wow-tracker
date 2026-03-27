@@ -9,7 +9,7 @@ import DiscordPanel from "@/components/DiscordPanel";
 
 export default function HomePage() {
   const [profiles, setProfiles] = useState<CharacterProfile[]>([]);
-  const [tierList, setTierList] = useState<TierListType>({ S: [], A: [], B: [], C: [], D: [] });
+  const [tierList, setTierList] = useState<TierListType>({ S: [], A: [], B: [], C: [], D: [], F: [] });
   const [loading, setLoading] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [error, setError] = useState("");
@@ -146,10 +146,11 @@ export default function HomePage() {
               <div className="space-y-1.5 text-xs font-mono">
                 {[
                   { tier: "S", label: "Score ≥ 80", color: "#ffd700" },
-                  { tier: "A", label: "Score 60–79", color: "#a335ee" },
-                  { tier: "B", label: "Score 40–59", color: "#0070dd" },
-                  { tier: "C", label: "Score 20–39", color: "#1eff00" },
-                  { tier: "D", label: "Score < 20", color: "#9d9d9d" },
+                  { tier: "A", label: "Score 65–79", color: "#a335ee" },
+                  { tier: "B", label: "Score 45–64", color: "#0070dd" },
+                  { tier: "C", label: "Score 30–44", color: "#1eff00" },
+                  { tier: "D", label: "Score 15–29", color: "#9d9d9d" },
+                  { tier: "F", label: "Score < 15",  color: "#c41e3a" },
                 ].map((row) => (
                   <div key={row.tier} className="flex items-center gap-2">
                     <span className="w-5 font-bold" style={{ color: row.color }}>{row.tier}</span>

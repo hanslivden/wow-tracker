@@ -9,6 +9,7 @@ const TIER_CONFIG: Record<TierLabel, { label: string; color: string; bg: string 
   B: { label: "B", color: "#0070dd", bg: "rgba(0,112,221,0.08)" },
   C: { label: "C", color: "#1eff00", bg: "rgba(30,255,0,0.06)" },
   D: { label: "D", color: "#9d9d9d", bg: "rgba(157,157,157,0.06)" },
+  F: { label: "F", color: "#c41e3a", bg: "rgba(196,30,58,0.06)" },
 };
 
 interface Props {
@@ -17,7 +18,7 @@ interface Props {
 }
 
 export default function TierList({ tierList, onRemove }: Props) {
-  const tiers: TierLabel[] = ["S", "A", "B", "C", "D"];
+  const tiers: TierLabel[] = ["S", "A", "B", "C", "D", "F"];
 
   const hasAny = tiers.some((t) => tierList[t].length > 0);
   if (!hasAny) {

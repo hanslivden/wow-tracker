@@ -23,7 +23,7 @@ export interface CharacterProfile {
   lastUpdated: string;
 }
 
-export type TierLabel = "S" | "A" | "B" | "C" | "D";
+export type TierLabel = "S" | "A" | "B" | "C" | "D" | "F";
 
 export interface TierEntry {
   character: CharacterProfile;
@@ -37,6 +37,7 @@ export interface TierList {
   B: TierEntry[];
   C: TierEntry[];
   D: TierEntry[];
+  F: TierEntry[];
 }
 
 // Raider.io API response shape (partial)
