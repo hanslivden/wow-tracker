@@ -51,7 +51,8 @@ export async function fetchCharacterProfile(
     ilvl: data.gear?.item_level_equipped ?? 0,
     mplusScore,
     mplusScoreColor,
-    thumbnailUrl: data.thumbnail_url,
+    // Upgrade from 56×56 avatar crop to 200×250 full portrait
+    thumbnailUrl: data.thumbnail_url?.replace("-avatar.jpg", "-main.jpg") ?? data.thumbnail_url,
     profileUrl: data.profile_url,
     lastUpdated: new Date().toISOString(),
   };

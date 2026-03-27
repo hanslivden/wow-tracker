@@ -80,26 +80,25 @@ export default function CharacterCard({ character, onRemove, rank, percentile }:
         </button>
       )}
 
-      {/* Avatar — fixed 56×56, no upscaling */}
-      <div className="relative h-14 w-full overflow-hidden bg-[#1e293b]">
+      {/* Portrait — 200×250 main image, show upper body / face */}
+      <div className="relative h-36 w-full overflow-hidden bg-[#1e293b]">
         {character.thumbnailUrl ? (
           <Image
             src={character.thumbnailUrl}
-            alt={`${character.name} avatar`}
+            alt={`${character.name} portrait`}
             fill
             className="object-cover object-top"
-            style={{ imageRendering: "auto" }}
             unoptimized
-            sizes="160px"
+            sizes="200px"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <svg viewBox="0 0 24 24" className="w-7 h-7 text-[#334155]" fill="currentColor">
+            <svg viewBox="0 0 24 24" className="w-10 h-10 text-[#334155]" fill="currentColor">
               <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
             </svg>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent" />
       </div>
 
       {/* Info */}
