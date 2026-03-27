@@ -23,9 +23,10 @@ interface Props {
   character: CharacterProfile;
   onRemove?: (id: string) => void;
   rank?: number;
+  percentile?: number;
 }
 
-export default function CharacterCard({ character, onRemove, rank }: Props) {
+export default function CharacterCard({ character, onRemove, rank, percentile }: Props) {
   const classColor = CLASS_COLORS[character.class] ?? "#c8a848";
   const scoreColor = character.mplusScoreColor ?? "#ffffff";
 
@@ -120,6 +121,15 @@ export default function CharacterCard({ character, onRemove, rank }: Props) {
             </p>
           </div>
         </div>
+
+        {/* Percentile badge */}
+        {percentile !== undefined && (
+          <div className="mt-1.5 text-center">
+            <span className="text-[9px] font-mono text-[#475569]">
+              top <span className="text-[#c8a848] font-bold">{100 - percentile}%</span> EU
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

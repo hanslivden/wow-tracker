@@ -27,7 +27,8 @@ export type TierLabel = "S" | "A" | "B" | "C" | "D" | "F";
 
 export interface TierEntry {
   character: CharacterProfile;
-  compositeScore: number;
+  compositeScore: number; // weighted composite z-score
+  percentile: number;     // estimated EU population percentile (0–100)
   tier: TierLabel;
 }
 

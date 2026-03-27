@@ -140,21 +140,26 @@ export default function HomePage() {
 
             {/* Legend */}
             <div className="rounded-xl border border-[#334155] bg-[#0f172a] p-4">
-              <h3 className="text-xs font-bold font-mono text-[#94a3b8] uppercase tracking-widest mb-3">
+              <h3 className="text-xs font-bold font-mono text-[#94a3b8] uppercase tracking-widest mb-1">
                 Scoring
               </h3>
+              <p className="text-[9px] font-mono text-[#475569] mb-2 leading-relaxed">
+                z-score vs EU population<br />
+                ilvl μ645 σ13 · M+ μ1000 σ750
+              </p>
               <div className="space-y-1.5 text-xs font-mono">
                 {[
-                  { tier: "S", label: "Score ≥ 80", color: "#ffd700" },
-                  { tier: "A", label: "Score 65–79", color: "#a335ee" },
-                  { tier: "B", label: "Score 45–64", color: "#0070dd" },
-                  { tier: "C", label: "Score 30–44", color: "#1eff00" },
-                  { tier: "D", label: "Score 15–29", color: "#9d9d9d" },
-                  { tier: "F", label: "Score < 15",  color: "#c41e3a" },
+                  { tier: "S", label: "top ~2.5%",   sub: "z ≥ +2.0", color: "#ffd700" },
+                  { tier: "A", label: "top ~16%",    sub: "z ≥ +1.0", color: "#a335ee" },
+                  { tier: "B", label: "above avg",   sub: "z ≥  0.0", color: "#0070dd" },
+                  { tier: "C", label: "below avg",   sub: "z ≥ −1.0", color: "#1eff00" },
+                  { tier: "D", label: "bottom ~16%", sub: "z ≥ −2.0", color: "#9d9d9d" },
+                  { tier: "F", label: "bottom ~2.5%",sub: "z < −2.0", color: "#c41e3a" },
                 ].map((row) => (
                   <div key={row.tier} className="flex items-center gap-2">
                     <span className="w-5 font-bold" style={{ color: row.color }}>{row.tier}</span>
-                    <span className="text-[#475569]">{row.label}</span>
+                    <span className="text-[#94a3b8]">{row.label}</span>
+                    <span className="text-[#334155] ml-auto">{row.sub}</span>
                   </div>
                 ))}
               </div>

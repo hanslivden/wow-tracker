@@ -72,6 +72,7 @@ export default function TierList({ tierList, onRemove }: Props) {
                     character={entry.character}
                     onRemove={onRemove}
                     rank={i + 1}
+                    percentile={entry.percentile}
                   />
                 ))}
               </div>
