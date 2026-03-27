@@ -6,14 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cron": "tsx scripts/cron.ts",
+    "post-now": "tsx scripts/post-now.ts"
   },
   "dependencies": {
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "node-cron": "^3.0.3",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "dotenv": "^16.4.7"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -22,6 +25,7 @@
     "@types/node-cron": "^3.0.11",
     "@types/uuid": "^10.0.0",
     "typescript": "^5",
+    "tsx": "^4.19.3",
     "tailwindcss": "^4",
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
