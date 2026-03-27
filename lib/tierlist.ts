@@ -117,5 +117,14 @@ export function buildTierList(characters: CharacterProfile[]): TierList {
   for (const entry of entries) {
     tierList[entry.tier].push(entry);
   }
+
+  // Guarantee at least one S-tier: promote the highest-ranked character.
+  if (tierList.S.length === 0 && entries.length > 0) {
+    const top = entries[0];
+    const fromTier = top.tier as keyof TierList;
+    tierList[fromTier] = tierList[fromTier].filter((e) => e !== top);
+    tierList.S.push({ ...top, tier: "S" });
+  }
+
   return tierList;
 }
