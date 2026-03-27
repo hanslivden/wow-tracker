@@ -43,13 +43,13 @@ export default function DiscordPanel({ characterCount }: Props) {
 
       <p className="text-xs text-[#94a3b8] font-mono mb-3 leading-relaxed">
         Post the current tier list to your Discord channel via webhook.
-        Also runs daily at <span className="text-[#c8a848]">20:00 UTC</span> via cron.
+        Also runs every <span className="text-[#c8a848]">Wednesday at 08:00 CET</span> via cron.
       </p>
 
       {/* Cron info */}
       <div className="mb-3 px-3 py-2 rounded-lg bg-[#1e293b] border border-[#334155]">
         <p className="text-[10px] font-mono text-[#94a3b8] uppercase tracking-widest mb-1">Cron Schedule</p>
-        <p className="text-xs font-mono text-[#c8a848]">0 20 * * * — daily at 20:00 UTC</p>
+        <p className="text-xs font-mono text-[#c8a848]">0 7 * * 3 — Wednesdays at 08:00 CET</p>
         <p className="text-[10px] text-[#475569] font-mono mt-1">
           Set <code className="text-[#94a3b8]">CRON_SECRET</code> + <code className="text-[#94a3b8]">DISCORD_WEBHOOK_URL</code> in env
         </p>
