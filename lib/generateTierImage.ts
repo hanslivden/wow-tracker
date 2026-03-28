@@ -46,9 +46,8 @@ async function fetchBase64(url: string): Promise<string | null> {
 }
 
 function loadFont(filename: string): ArrayBuffer {
-  const filePath = path.join(process.cwd(), "public", "fonts", filename);
+  const filePath = path.join(process.cwd(), "node_modules", "@fontsource", "inter", "files", filename);
   const buf = fs.readFileSync(filePath);
-  // .buffer is the shared pool — slice to get only this file's bytes
   return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
 }
 
@@ -247,8 +246,8 @@ export async function generateTierListImage(tierList: TierList): Promise<Buffer>
   const allEntries = tiers.flatMap((t) => tierList[t]);
 
   // Load fonts from disk (sync) + portraits in parallel
-  const interBold    = loadFont("Inter-Bold.ttf");
-  const interRegular = loadFont("Inter-Regular.ttf");
+  const interRegular = loadFont("inter-latin-400-normal.woff");
+  const interBold    = loadFont("inter-latin-700-normal.woff");
   const portraitResults = await Promise.all(
     allEntries.map((e) => fetchBase64(e.character.thumbnailUrl))
   );
