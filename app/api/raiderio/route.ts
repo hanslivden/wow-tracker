@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchCharacterProfile } from "@/lib/raiderio";
+import { fetchCharacterProfile, fetchAllProfiles } from "@/lib/raiderio";
 import { getCharacters } from "@/lib/storage";
 import type { WowRegion } from "@/types";
 
@@ -10,24 +10,8 @@ export async function GET(req: NextRequest) {
 
   if (searchParams.get("all") === "true") {
     const tracked = await getCharacters();
-    const results = await Promise.allSettled(
-      tracked.map((c) =>
-        fetchCharacterProfile(c.name, c.realm, c.region, c.id)
-      )
-    );
-
-    const profiles = results
-      .filter((r) => r.status === "fulfilled")
-      .map((r) => (r as PromiseFulfilledResult<Awaited<ReturnType<typeof fetchCharacterProfile>>>).value);
-
-    const errors = results
-      .filter((r) => r.status === "rejected")
-      .map((r, i) => ({
-        character: tracked[i]?.name,
-        error: (r as PromiseRejectedResult).reason?.message,
-      }));
-
-    return NextResponse.json({ profiles, errors });
+    const profiles = await fetchAllProfiles(tracked);
+    return NextResponse.json({ profiles });
   }
 
   const name = searchParams.get("name");

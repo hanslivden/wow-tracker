@@ -6,7 +6,7 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
 import { getCharacters } from "../lib/storage";
-import { fetchCharacterProfile } from "../lib/raiderio";
+import { fetchAllProfiles } from "../lib/raiderio";
 import { buildTierList } from "../lib/tierlist";
 import { postTierListToDiscord } from "../lib/discord";
 
@@ -20,27 +20,15 @@ async function main() {
   }
 
   console.log(`Fetching profiles for ${tracked.length} character(s)...`);
-  const results = await Promise.allSettled(
-    tracked.map((c) => fetchCharacterProfile(c.name, c.realm, c.region, c.id))
-  );
+  const profiles = await fetchAllProfiles(tracked);
 
-  const profiles = results
-    .filter((r) => r.status === "fulfilled")
-    .map((r) => (r as PromiseFulfilledResult<ReturnType<typeof fetchCharacterProfile> extends Promise<infer T> ? T : never>).value);
-
-  results
-    .filter((r) => r.status === "rejected")
-    .forEach((r, i) => {
-      console.warn(`  Failed: ${tracked[i]?.name} — ${(r as PromiseRejectedResult).reason?.message}`);
-    });
-
-  console.log(`Building tier list from ${profiles.length} profile(s)...`);
+  console.log(`Building tier list...`);
   const tierList = buildTierList(profiles);
 
   console.log("Posting to Discord...");
   await postTierListToDiscord(tierList);
 
-  console.log("Done.");
+  console.log(`Done. Posted ${profiles.length} character(s).`);
 }
 
 main().catch((err) => {

@@ -1,4 +1,4 @@
-import type { CharacterProfile, RaiderIOResponse, WowRegion } from "@/types";
+import type { CharacterProfile, RaiderIOResponse, TrackedCharacter, WowRegion } from "@/types";
 
 const RAIDERIO_BASE = "https://raider.io/api/v1";
 
@@ -56,4 +56,38 @@ export async function fetchCharacterProfile(
     profileUrl: data.profile_url,
     lastUpdated: new Date().toISOString(),
   };
+}
+
+function placeholderProfile(c: TrackedCharacter): CharacterProfile {
+  return {
+    id: c.id,
+    name: c.name,
+    realm: c.realm,
+    region: c.region,
+    class: "Unknown",
+    spec: "Unknown",
+    ilvl: 0,
+    mplusScore: 0,
+    mplusScoreColor: "#475569",
+    thumbnailUrl: "",
+    profileUrl: `https://raider.io/characters/${c.region}/${c.realm}/${c.name}`,
+    lastUpdated: new Date().toISOString(),
+  };
+}
+
+/**
+ * Fetch all tracked characters. Characters that fail to load from Raider.io
+ * are replaced with a placeholder (ilvl 0, M+ 0) so they always appear in
+ * the tier list rather than being silently dropped.
+ */
+export async function fetchAllProfiles(
+  characters: TrackedCharacter[]
+): Promise<CharacterProfile[]> {
+  const results = await Promise.allSettled(
+    characters.map((c) => fetchCharacterProfile(c.name, c.realm, c.region, c.id))
+  );
+
+  return results.map((result, i) =>
+    result.status === "fulfilled" ? result.value : placeholderProfile(characters[i])
+  );
 }

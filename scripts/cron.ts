@@ -3,7 +3,7 @@ dotenv.config({ path: ".env.local" });
 
 import cron from "node-cron";
 import { getCharacters } from "../lib/storage";
-import { fetchCharacterProfile } from "../lib/raiderio";
+import { fetchAllProfiles } from "../lib/raiderio";
 import { buildTierList } from "../lib/tierlist";
 import { postTierListToDiscord } from "../lib/discord";
 
@@ -19,19 +19,7 @@ async function runPost() {
       return;
     }
 
-    const results = await Promise.allSettled(
-      tracked.map((c) => fetchCharacterProfile(c.name, c.realm, c.region, c.id))
-    );
-
-    const profiles = results
-      .filter((r) => r.status === "fulfilled")
-      .map((r) => (r as PromiseFulfilledResult<ReturnType<typeof fetchCharacterProfile> extends Promise<infer T> ? T : never>).value);
-
-    const failed = results.filter((r) => r.status === "rejected");
-    if (failed.length > 0) {
-      console.warn(`[${ts}] ${failed.length} character(s) failed to fetch.`);
-    }
-
+    const profiles = await fetchAllProfiles(tracked);
     const tierList = buildTierList(profiles);
     await postTierListToDiscord(tierList);
 
