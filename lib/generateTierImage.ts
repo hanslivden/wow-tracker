@@ -47,7 +47,9 @@ async function fetchBase64(url: string): Promise<string | null> {
 
 function loadFont(filename: string): ArrayBuffer {
   const filePath = path.join(process.cwd(), "public", "fonts", filename);
-  return fs.readFileSync(filePath).buffer as ArrayBuffer;
+  const buf = fs.readFileSync(filePath);
+  // .buffer is the shared pool — slice to get only this file's bytes
+  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
 }
 
 function rowHeight(entries: TierEntry[]): number {
