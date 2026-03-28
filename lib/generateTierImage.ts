@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
 import type { TierList, TierEntry, TierLabel } from "@/types";
@@ -43,9 +45,9 @@ async function fetchBase64(url: string): Promise<string | null> {
   }
 }
 
-async function loadFont(url: string): Promise<ArrayBuffer> {
-  const res = await fetch(url);
-  return res.arrayBuffer();
+function loadFont(filename: string): ArrayBuffer {
+  const filePath = path.join(process.cwd(), "public", "fonts", filename);
+  return fs.readFileSync(filePath).buffer as ArrayBuffer;
 }
 
 function rowHeight(entries: TierEntry[]): number {
@@ -242,12 +244,12 @@ export async function generateTierListImage(tierList: TierList): Promise<Buffer>
   const tiers: TierLabel[] = ["S", "A", "B", "C", "D", "F"];
   const allEntries = tiers.flatMap((t) => tierList[t]);
 
-  // Load font + all portraits in parallel
-  const [interBold, interRegular, ...portraitResults] = await Promise.all([
-    loadFont("https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYAZ9hiJ-Ek-_EeA.woff"),
-    loadFont("https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff"),
-    ...allEntries.map((e) => fetchBase64(e.character.thumbnailUrl)),
-  ]);
+  // Load fonts from disk (sync) + portraits in parallel
+  const interBold    = loadFont("Inter-Bold.ttf");
+  const interRegular = loadFont("Inter-Regular.ttf");
+  const portraitResults = await Promise.all(
+    allEntries.map((e) => fetchBase64(e.character.thumbnailUrl))
+  );
 
   const portraits = new Map<string, string | null>();
   allEntries.forEach((e, i) => portraits.set(e.character.id, portraitResults[i] ?? null));
